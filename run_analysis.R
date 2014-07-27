@@ -51,3 +51,8 @@ colnames(activ) <-c("id","Name")
 dataset[,2]<-activ$Name[match(dataset[,2],activ$id)]
 
 write.table(dataset, file="./getdata-005-project/tidy1.txt", row.names=FALSE)
+
+## Summarize the average values by activity by subject
+require(doBy)
+dataset.sum <- summaryBy(.~subject+activity, data=dataset, FUN=mean)
+write.table(dataset.sum, file="./getdata-005-project/tidy2.txt", row.names=FALSE)
