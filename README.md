@@ -1,64 +1,22 @@
 getdata-005-project
 ===================
-
 Getting and Cleaning Data Course Project
 
-## Getting and Cleaning Data Course Project
-## 
+The script "run_analysis.R" performs the following steps to extract and combine the
+data into a tidy dataset contained in one file.
 
-## Read raw data from test and train datasets. 
-## Each consists of three parts, subject vector, activity vector and 
-##    data table consisting of measured and calculated values.
-
-sub.train<-read.table("./UCI HAR Dataset/train/subject_train.txt")
-sub.test<-read.table("./UCI HAR Dataset/test/subject_test.txt")
-
-act.train<-read.table("./UCI HAR Dataset/train/y_train.txt")
-act.test<-read.table("./UCI HAR Dataset/test/y_test.txt")
-
-data.train<-read.table("./UCI HAR Dataset/train/X_train.txt")
-data.test<-read.table("./UCI HAR Dataset/test/X_test.txt")
-
-## List of columns containing mean and standard deviation of measured values.
-cfilter <- c(1:6,41:46,121:126)
-
-## Combine subject, activity and measured data
-test.frame <- cbind(sub.test, act.test, data.test[,cfilter])
-train.frame <- cbind(sub.train, act.train, data.train[,cfilter])
-
-## Housekeeping to free up memory...
-rm("sub.train","sub.test","act.train","act.test","data.train","data.test")
-
-## Combine trimmed train and test datasets
-dataset <- rbind(test.frame, train.frame)
-
-## Add colum names.  c("subject","activity",
-##						"body.acc.mean.X","body.acc.mean.Y","body.acc.mean.Z",
-##						"body.acc.std.X","body.acc.std.Y","body.acc.std.Z",
-##						"gravity.acc.mean.X","gravity.acc.mean.Y","gravity.acc.mean.Z",
-##						"gravity.acc.std.X","gravity.acc.std.Y","gravity.acc.std.Z",
-##						"body.gyro.mean.X","body.gyro.mean.Y","body.gyro.mean.Z",
-##						"body.gyro.std.X","body.gyro.std.Y","body.gyro.std.Z")
-colnames(dataset) <- c("subject","activity","body.acc.mean.X","body.acc.mean.Y","body.acc.mean.Z","body.acc.std.X","body.acc.std.Y","body.acc.std.Z","gravity.acc.mean.X","gravity.acc.mean.Y","gravity.acc.mean.Z","gravity.acc.std.X","gravity.acc.std.Y","gravity.acc.std.Z","body.gyro.mean.X","body.gyro.mean.Y","body.gyro.mean.Z","body.gyro.std.X","body.gyro.std.Y","body.gyro.std.Z")
-
-## Housekeeping...
-rm("test.frame", "train.frame")
-
-## Apply activity labels
-## 1 WALKING
-## 2 WALKING_UPSTAIRS
-## 3 WALKING_DOWNSTAIRS
-## 4 SITTING
-## 5 STANDING
-## 6 LAYING
-activ <- read.table("./UCI HAR Dataset/activity_labels.txt")
-colnames(activ) <-c("id","Name")
-dataset[,2]<-activ$Name[match(dataset[,2],activ$id)]
-
-write.table(dataset, file="./getdata-005-project/tidy1.txt", row.names=FALSE)
-
-## Summarize the average values by activity by subject
-require(doBy)
-dataset.sum <- summaryBy(.~subject+activity, data=dataset, FUN=mean)
-write.table(dataset.sum, file="./getdata-005-project/tidy2.txt", row.names=FALSE)
-
+    1. The raw data is read raw data from test and train datasets. 
+	   Each consists of three parts, subject vector, activity vector and data table
+	   consisting of measured and calculated values.
+	2. The subject and activity vector is combined with a filtered list of columns
+	   containing the mean and standard deviation of the measured values.
+	3. Some housekeeping is performed to free memory.
+	4. The two resulting datasets are combined into a single dataset
+	5. Column names are added to the dataset.
+	6. The last transformation is to substitute the activity values with labels
+	   using the match() function
+	7. The resulting dataset is written out to a text file.
+	
+The last part of the script generates an average of the measured values, summarized 
+by activity performed by each subject. This is performed using the summaryBy() function 
+which is part of the doBy package.
